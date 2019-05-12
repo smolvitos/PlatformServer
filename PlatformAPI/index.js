@@ -5,6 +5,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const routerRegAuth = require('./routes/regAuth')
 const routerLoadImage = require('./routes/loadImage')
+const routerDocker = require('./routes/dockerRoutes')
 const initPassport = require('./configs/passport').init //добавление стратегии JWT
 const passport = initPassport(require('passport'))
 //const users = initPassport.users
@@ -22,6 +23,7 @@ app.use(morgan('dev'))
 app.use(cors())
 app.use(routerRegAuth)
 app.use(routerLoadImage)
+app.use(routerDocker)
 
 app.get('/', (req, res) => {
 	res.json({ message: 'Express is up!'})
