@@ -2,40 +2,64 @@
 const { Docker } = require('node-docker-api')
 
 const docker = new Docker({ socketPath: '/var/run/docker.sock' })
-let dockerServices = []
-let tools = {}
-
-tools.checkForUpdate = (whereCompare, whatCompare) => {
-	let keys = Object.keys(whatCompare)
-	//console.log(whereCompare)
-	//console.log(whatCompare[keys[0]])
-	let status = false
-	let k = 0
-	keys.forEach((key, i) => {
-		whereCompare.forEach((obj, j) => {
-			k += 500
-			if (obj[key]) {
-				if (obj[key] == whatCompare[key]) {
-					status = true
-					//console.log('true')
-				} else {
-					status = false
-				}
-			} else {
-				status = false
-			}
-		})
-	})
-	console.log(k)
-	return status
-}
+let dockerServicesGlobal = []
 
 module.exports.listServices = () => (req, res) => {
 	docker.image.list()
 	.then((images) => {
 		//console.log(images)
-		
-		return new Promise((resolve, reject) => {
+		Promise.all(images.map((image) => {
+			return image.status()
+			.then((imageInfo) => {
+				let  { RepoTags } = imageInfo.data
+				return {
+				  	containerName: null,
+				  	baseImage: RepoTags[0],
+				  	status: null,
+				  	ports: null
+			  	}
+			})
+		}))
+		.then((dockerServices) => {
+			dockerServicesGlobal = dockerServices
+		})
+		.then(() => {
+			return docker.container.list({all: true})
+			.then((containers) => {
+				Promise.all(containers.map((container) => {
+					return container.status()
+					.then((containerInfo) => {
+						let  { Name } = containerInfo.data
+			  				,{ Image } = containerInfo.data.Config
+			  				,{ Status } = containerInfo.data.State
+			  				,{ Ports } = containerInfo.data.NetworkSettings
+			  			
+			  			for (let dockerService of dockerServicesGlobal) {
+			  				//console.log(dockerService)
+			  				//console.log(Image)
+			  				if (dockerService['baseImage'].split(':')[0] == Image) {
+			  					return {
+			  						containerName: Name,
+								  	baseImage: Image,
+								  	status: Status,
+								  	ports: Ports
+			  					}
+			  				} else {
+			  					return dockerService
+			  				}
+			  			}
+					})
+				}))
+				.then((servicesForClient) => {
+					console.log(servicesForClient)
+				})
+			})
+		})
+	})
+	.catch((error) => console.log(error))
+}
+
+		/*return new Promise((resolve, reject) => {
 			let dockerServices = []
 			images.forEach((image, number) => {
 				image.status()
@@ -82,14 +106,13 @@ module.exports.listServices = () => (req, res) => {
 		  			status: Status,
 		  			ports: Ports
 	  			}
-	  			console.log(dockerService) //только информация от Docker*/
+	  			console.log(dockerService) //только информация от Docker
 			})
 			
 			})
 		})
-	})
-	.catch((error) => console.log(error))
-	
+	})*/
+
 	/*docker.container.list({all: true})
 	.then((containers) => {
 		containers.forEach((container, number) => {
@@ -112,8 +135,6 @@ module.exports.listServices = () => (req, res) => {
 		})
 	})
 	.catch((error) => console.log(error))*/
-}
-
 // images[1].data.RepoTags
 // images - Array
 // RepoTags - Array
