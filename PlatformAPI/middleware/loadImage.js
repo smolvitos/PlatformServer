@@ -29,7 +29,7 @@ module.exports = (req, res, next) => {
                                 return callback(err)
                             }
                             const dockerEntity = new DockerModel({
-                            	serviceImage: stdout, //regExp for parsing is required (will added later)
+                            	baseImage: stdout, //regExp for parsing is required (will added later)
                             	serviceName: fields.servicename,
                             	serviceDescription: fields.description
                             })

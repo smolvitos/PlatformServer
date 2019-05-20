@@ -1,5 +1,6 @@
 //Сбор информации от сервиса Docker и из БД
 const { Docker } = require('node-docker-api')
+const DockerModel = require('../../models/docker')
 
 const docker = new Docker({ socketPath: '/var/run/docker.sock' })
 let dockerServicesGlobal = []
@@ -16,7 +17,9 @@ module.exports.listServices = () => (req, res) => {
 				  	containerName: null,
 				  	baseImage: RepoTags[0],
 				  	state: null,
-				  	ports: null
+				  	ports: null,
+				  	serviceName: null,
+					serviceDescription: null
 			  	}
 			})
 		}))
@@ -28,21 +31,35 @@ module.exports.listServices = () => (req, res) => {
 		docker.container.list({all: true})
 		.then((containers) => {
 			Promise.all(dockerServicesGlobal.map((dockerService) => {
-				for (let container of containers) {
-					console.log(container)
-					let  { Names, Image, State, Ports } = container.data
-			  		console.log(container.data.NetworkSettings.Networks)
-					if (dockerService['baseImage'].split(':')[0] == Image) {
-						console.log(`${Names[0]} ${Image} ${State} ${Ports}`)
-						return {
-							containerName: Names[0],
-				  			baseImage: Image,
-				  			state: State,
-				  			ports: Ports
+				//console.log(dockerService.baseImage)
+				return DockerModel.find({ baseImage: /dockerService.baseImage/i }).exec()
+				.addBack((err, info) => {
+					//if (err) console.error(err)
+					console.log(info)
+					for (let container of containers) { //может быть меньше, чем образов
+						//console.log(container)
+						let  { Names, Image, State, Ports } = container.data
+
+						if (dockerService['baseImage'].split(':')[0] == Image) {
+							console.log(`${Names[0]} ${Image} ${State} ${Ports}`)
+							return {
+								containerName: Names[0],
+					  			baseImage: Image,
+					  			state: State,
+					  			ports: Ports,
+					  			serviceName: info ? info.serviceName : null,
+								serviceDescription: info ? info.serviceDescription : null
+							}
 						}
 					}
-				}
-				return dockerService
+					dockerService.serviceName = info.serviceName
+					dockerService.serviceDescription = info.serviceDescription
+					console.log(dockerService)
+					return dockerService
+				})
+				.catch((error) => {
+					return dockerService
+				})
 			}))
 			.then((servicesForClient) => {
 				res.json(servicesForClient)
