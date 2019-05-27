@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
     var form = new formidable.IncomingForm()
     form.keepExtensions = true
     form.maxFileSize = 500 * 1024 * 1024
-    form.uploadDir = '/home/dvoron/diplom_app/app/uploaded_images'
+    form.uploadDir = '/root/diplom_app/uploaded_images'
     form.parse(req, function(err, fields, files) {
     	console.log(fields)
         async.parallel(Object.keys(files).map(function(name) {
