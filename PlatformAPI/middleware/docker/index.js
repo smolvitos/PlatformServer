@@ -41,7 +41,7 @@ function listServices() {
                             console.log(container)
                             let  { Names, Image, State, Ports } = container.data
 
-                            if (dockerService['baseImage'] == Image) {
+                            if (~dockerService['baseImage'].indexOf(Image)) { //Image < dockerService['baseImage']
                                 console.log(`${Names[0]} ${Image} ${State} ${Ports}`)
                                 return {
                                     containerName: Names[0],
@@ -77,7 +77,8 @@ module.exports.startService = () => (req, res) => {  //input JSON {state, baseIm
 	if (!req.body.state) {
 		docker.container.create({
   			Image: req.body.baseImage,
-  			Detach: true
+  			Detach: true,
+            PublishAllPorts: true
 		})
 		.then((container) => {
 			container.start()
