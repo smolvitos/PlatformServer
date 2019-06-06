@@ -31,11 +31,12 @@ module.exports = (req, res, next) => {
                             const dockerEntity = new DockerModel({
                             	baseImage: stdout, //regExp for parsing is required (will added later)
                             	serviceName: fields.servicename,
+                                serviceShortDescription: fields.shortdescription,
                             	serviceDescription: fields.description
                             })
 
                             dockerEntity.save((err, data) => {
-                                if (err) return callback(new Error('This Docker image duplicates some another'))
+                                if (err) return callback(new Error(err.message))
                                 console.log(`stdout ${stdout}`)
                                 callback(null, `Image ${file.name} has been loaded. DockerImage ${file.name} has been loaded and avaible in ${form.uploadDir}`)
                             })

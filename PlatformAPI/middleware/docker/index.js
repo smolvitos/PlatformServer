@@ -20,7 +20,8 @@ function listServices() {
                         state: null,
                         ports: null,
                         serviceName: null,
-                        serviceDescription: null
+                        serviceDescription: null,
+                        serviceShortDescription: null
                     }
                 })
             }))
@@ -49,12 +50,14 @@ function listServices() {
                                     state: State,
                                     ports: Ports,
                                     serviceName: info ? info.serviceName : null,
-                                    serviceDescription: info ? info.serviceDescription : null
+                                    serviceDescription: info ? info.serviceDescription : null,
+                                    serviceShortDescription: info ? info.serviceShortDescription : null
                                 }
                             }
                         }
                         dockerService.serviceName = info.serviceName
                         dockerService.serviceDescription = info.serviceDescription
+                        dockerService.serviceShortDescription = info.serviceShortDescription
                         //console.log(dockerService)
                         return dockerService
                     })

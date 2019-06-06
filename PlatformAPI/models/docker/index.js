@@ -11,6 +11,10 @@ const DockerSchema = mongoose.Schema({
     	unique: true,
     	required: true
   	},
+    serviceShortDescription: {
+        type: String,
+        maxlength: 100
+    },
   	serviceDescription: {
     	type: String,
     	required: true
