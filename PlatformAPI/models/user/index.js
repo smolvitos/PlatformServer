@@ -18,7 +18,8 @@ const UserSchema = mongoose.Schema({
 		min: 1,
 		max: 100
 	},
-	gender: String
+	gender: String,
+    isAdmin: Boolean
 })
 
 UserSchema.methods.comparePassword = function(password, callback) {

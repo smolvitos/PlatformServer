@@ -32,7 +32,8 @@ module.exports = (req, res, next) => {
                             	baseImage: stdout, //regExp for parsing is required (will added later)
                             	serviceName: fields.servicename,
                                 serviceShortDescription: fields.shortdescription,
-                            	serviceDescription: fields.description
+                            	serviceDescription: fields.description,
+                                //answers: fields.answers
                             })
 
                             dockerEntity.save((err, data) => {

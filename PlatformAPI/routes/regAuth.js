@@ -13,7 +13,8 @@ router.post('/register', (req, res) => {
 		firstName: req.body.firstName,
 		lastName: req.body.lastName,
 		age: req.body.age,
-		gender: req.body.gender
+		gender: req.body.gender,
+        isAdmin: false
 	})
 	console.log(`${req.body.username} ${req.body.password}`)
 
@@ -64,12 +65,16 @@ router.post('/login', (req, res) => {
 						message: `Wrong password ${password}`
 					})
 				} else {
-					let payload = { username: user.username }
+					let payload = {
+                        username: user.username,
+                        isAdmin: user.isAdmin
+                    }
 					let token = jwt.sign(payload, jwtOptions.secretOrKey)
 					res.json({
 						status: 'success',
 						message: `User ${user.username} has been authorized`,
-						token
+						token,
+                        isAdmin: true
 					})
 				}
 			})
