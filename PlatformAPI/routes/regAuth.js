@@ -74,7 +74,7 @@ router.post('/login', (req, res) => {
 						status: 'success',
 						message: `User ${user.username} has been authorized`,
 						token,
-                        isAdmin: true
+                        isAdmin: user.isAdmin
 					})
 				}
 			})

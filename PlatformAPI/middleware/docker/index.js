@@ -104,11 +104,13 @@ module.exports.startService = () => (req, res) => {  //input JSON {state, baseIm
 
 		docker.container.list(opts)
 		.then((containers) => {
-			containers[0].start()
-			res.json({
+			return containers[0].start()
+        })
+        .then((container) => {
+            res.json({
 				status: `Container ${req.body.containerName} has been started.`
 			})
-		})
+        })
         .catch((error) => {
             res.status(500).json({
                 status: 'failed',
@@ -131,13 +133,13 @@ module.exports.pauseService = () => (req, res) => { //input JSON {state, contain
 
 	docker.container.list(opts)
 	.then((container) => {
-		container[0].stop()
-        .then((container) => {
-            res.json({
-			    status: `${req.body.containerName} has been paused.`
-		    })
-        })
-	})
+		return container[0].stop()
+    })
+    .then((container) => {
+        res.json({
+			status: `${req.body.containerName} has been paused.`
+		})
+    })
 	.catch((error) => {
 		res.json(error.stack)
 	})
@@ -156,16 +158,16 @@ module.exports.stopService = () => (req, res) => { //input JSON {state, containe
 
 	docker.container.list(opts)
 	.then((containers) => {
-		containers[0].stop()
-		.then((container) => {
-			container.delete()
-            .then((container) => {
-                res.json({
-				    status: `${req.body.containerName} has been stopped`
-			    })
-            })
+		return containers[0].stop()
+    })
+    .then((container) => {
+		return container.delete()
+    })    
+    .then((container) => {
+        res.json({
+		    status: `${req.body.containerName} has been stopped`
 		})
-	})
+    })
 	.catch((error) => {
 		res.json(error.message)
 	})
@@ -177,16 +179,16 @@ module.exports.deleteService = () => (req, res) => { //input JSON {state, baseIm
 		docker.image.get(req.body.baseImage).status()
 		.then((image) => {
 			console.log(image)
-			image.remove()
-            .then((image) => {
-                return DockerModel.findOneAndRemove({ baseImage: new RegExp(req.body.baseImage, 'i') }).exec()
-            })
-            .then((info) => {
-                 res.json({
-				    status: `${req.body.baseImage} has been deleted. ${info}`
-			    })
-            })
-		})
+			return image.remove()
+        })
+        .then((image) => {
+            return DockerModel.findOneAndRemove({ baseImage: new RegExp(req.body.baseImage, 'i') }).exec()
+        })
+        .then((info) => {
+            res.json({
+				status: `${req.body.baseImage} has been deleted. ${info}`
+			})
+        })
 		.catch((error) => {
 			res.json(error.message)
 		})
