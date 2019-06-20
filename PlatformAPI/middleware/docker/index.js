@@ -1,6 +1,7 @@
 //Сбор информации от сервиса Docker и из БД
 const { Docker } = require('node-docker-api')
 const DockerModel = require('../../models/docker')
+const formidable = require('formidable')
 
 const docker = new Docker({ socketPath: '/var/run/docker.sock' })
 let dockerServicesGlobal = []
@@ -15,6 +16,7 @@ function listServices() {
                 .then((imageInfo) => {
                     let  { RepoTags } = imageInfo.data
                     return {
+                        _id: null,
                         containerName: null,
                         baseImage: RepoTags[0],
                         state: null,
@@ -45,6 +47,7 @@ function listServices() {
                             if (~dockerService['baseImage'].indexOf(Image)) { //Image < dockerService['baseImage']
                                 console.log(`${Names[0]} ${Image} ${State} ${Ports}`)
                                 return {
+                                    _id: info ? info._id : null,
                                     containerName: Names[0],
                                     baseImage: Image,
                                     state: State,
@@ -75,6 +78,34 @@ function listServices() {
 }
 
 module.exports.listServices = listServices
+
+module.exports.updateService = () => (req, res) => {
+    var form = new formidable.IncomingForm()
+    form.parse(req, function(err, fields, files) {
+        DockerModel.updateOne(
+            { 
+                _id: fields._id 
+            },
+            { 
+                serviceName: fields.servicename,
+                serviceDescription: fields.description,
+                serviceShortDescription: fields.shortdescription
+            },
+            (error, writeOpResult) => {
+                if (error) {
+                    res.status(500).json({
+                        status: 'failed',
+                        message: error.message
+                    })
+                }
+                console.log(writeOpResult)
+                res.json({
+                    status: `Service ${fields._id} (${fields.servicename}) has been updated`
+                })
+            }
+        )
+    })
+}
 
 module.exports.startService = () => (req, res) => {  //input JSON {state, baseImage, containerName}
 	if (!req.body.state) {

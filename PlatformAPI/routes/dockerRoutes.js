@@ -11,5 +11,6 @@ router.post('/api/v1/services/start', passport.authenticate('jwt', {session: fal
 router.post('/api/v1/services/pause', passport.authenticate('jwt', {session: false}), checkPrivileges, dockerAPI.pauseService()) //work
 router.post('/api/v1/services/stop', passport.authenticate('jwt', {session: false}), checkPrivileges, dockerAPI.stopService()) // work
 router.post('/api/v1/services/delete', passport.authenticate('jwt', {session: false}), checkPrivileges, dockerAPI.deleteService()) //work
+router.post('/api/v1/services/update', passport.authenticate('jwt', {session: false}), checkPrivileges, dockerAPI.updateService()) //
 
 module.exports = router
