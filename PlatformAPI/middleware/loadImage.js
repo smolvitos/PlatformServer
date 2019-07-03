@@ -33,7 +33,7 @@ module.exports = (req, res, next) => {
                             	serviceName: fields.servicename,
                                 serviceShortDescription: fields.shortdescription,
                             	serviceDescription: fields.description,
-                                //answers: fields.answers
+                                trueAnswers: fields.trueAnswers
                             })
 
                             dockerEntity.save((err, data) => {

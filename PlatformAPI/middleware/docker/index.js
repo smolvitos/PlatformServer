@@ -93,14 +93,15 @@ module.exports.updateService = () => (req, res) => {
             },
             (error, writeOpResult) => {
                 if (error) {
-                    res.status(500).json({
+                    return res.status(500).json({
                         status: 'failed',
                         message: error.message
                     })
                 }
                 console.log(writeOpResult)
                 res.json({
-                    status: `Service ${fields._id} (${fields.servicename}) has been updated`
+                    status: 'success',
+                    message: `Service ${fields._id} (${fields.servicename}) has been updated`
                 })
             }
         )
@@ -118,7 +119,8 @@ module.exports.startService = () => (req, res) => {  //input JSON {state, baseIm
 			container.start()
             .then((container) => {
                 res.json({
-				    status: `Image ${req.body.baseImage} has been started.`
+                    status: 'success',
+				    message: `Image ${req.body.baseImage} has been started.`
 			    })
             })
 		})
@@ -139,7 +141,8 @@ module.exports.startService = () => (req, res) => {  //input JSON {state, baseIm
         })
         .then((container) => {
             res.json({
-				status: `Container ${req.body.containerName} has been started.`
+                status: 'success',
+				message: `Container ${req.body.containerName} has been started.`
 			})
         })
         .catch((error) => {
@@ -154,7 +157,8 @@ module.exports.startService = () => (req, res) => {  //input JSON {state, baseIm
 module.exports.pauseService = () => (req, res) => { //input JSON {state, containerName}
 	if (req.body.state != 'running') {
 		return res.json({
-			status: 'wrong operation'
+			status: 'failed',
+            message: 'wrong operation'
 		})
 	}
 
@@ -168,18 +172,23 @@ module.exports.pauseService = () => (req, res) => { //input JSON {state, contain
     })
     .then((container) => {
         res.json({
-			status: `${req.body.containerName} has been paused.`
+            status: 'success',
+			message: `${req.body.containerName} has been paused.`
 		})
     })
 	.catch((error) => {
-		res.json(error.stack)
+		res.status(500).json({
+            status: 'failed',
+            message: error.message
+        })
 	})
 }
 
 module.exports.stopService = () => (req, res) => { //input JSON {state, containerName}
 	if (req.body.state != 'running' && req.body.state != 'exited') {
 		return res.json({
-			status: 'wrong operation'
+			status: 'failed',
+            message: 'wrong operation'
 		})
 	}
 
@@ -196,11 +205,15 @@ module.exports.stopService = () => (req, res) => { //input JSON {state, containe
     })    
     .then((container) => {
         res.json({
-		    status: `${req.body.containerName} has been stopped`
+            status: 'success',
+		    message: `${req.body.containerName} has been stopped`
 		})
     })
 	.catch((error) => {
-		res.json(error.message)
+		res.status(500).json({
+            status: 'failed',
+            message: error.message
+        })
 	})
 }
 
@@ -217,11 +230,15 @@ module.exports.deleteService = () => (req, res) => { //input JSON {state, baseIm
         })
         .then((info) => {
             res.json({
-				status: `${req.body.baseImage} has been deleted. ${info}`
+                status: 'success',
+				message: `${req.body.baseImage} has been deleted. ${info}`
 			})
         })
 		.catch((error) => {
-			res.json(error.message)
+			res.status(500).json({
+                status: 'failed',
+                message: error.message
+            })
 		})
 	} else {
 		//удалить контейнеры, а затем образ
@@ -239,11 +256,15 @@ module.exports.deleteService = () => (req, res) => { //input JSON {state, baseIm
         })
         .then((info) => {
             res.json({
-				status: `${req.body.baseImage} has been deleted with container`
+                status: 'success',
+				message: `${req.body.baseImage} has been deleted with container`
 			}) 
         })
         .catch((error) => {
-			res.json(error.message)
+			res.status(500).json({
+                status: 'failed',
+                message: error.message
+            })
 		})
     }	
 }

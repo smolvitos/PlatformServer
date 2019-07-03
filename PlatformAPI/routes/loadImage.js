@@ -1,6 +1,7 @@
 const express =require('express')
 const router = express.Router()
 const loadImage = require('../middleware/loadImage')
+const loadVm = require('../middleware/loadVm')
 
 router.get('/load', (req, res) => {
 	res.send(`<form enctype="multipart/form-data" method="post" action="/load">
@@ -9,6 +10,7 @@ router.get('/load', (req, res) => {
   </form>`)
 })
 
-router.post('/load', loadImage)
+router.post('/loaddocker', loadImage)
+router.post('/loadvm', loadVm)
 
 module.exports = router

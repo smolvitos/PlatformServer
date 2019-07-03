@@ -18,7 +18,11 @@ const DockerSchema = mongoose.Schema({
   	serviceDescription: {
     	type: String,
     	required: true
-  	}
+  	},
+    trueAnswers: {
+        type: Array,
+        required: false
+    }
 })
 
 const DockerModel = mongoose.model('dockerimages', DockerSchema)
