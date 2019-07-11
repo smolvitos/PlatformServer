@@ -53,10 +53,12 @@ module.exports = (req, res, next) => {
         }), (err, data) => { //итоговый callback
             if (err) {
                 res.status(400).json({
+                    status: 'failed',
                     message: err.message
                 })
             } else {
                 res.json({
+                    status: 'success',
                     message: data[0]
                 })
             }

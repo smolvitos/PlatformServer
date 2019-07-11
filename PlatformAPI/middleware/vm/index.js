@@ -9,6 +9,15 @@ module.exports.listVms = () => (req, res) => {
                 message: `${err.message}`
             })
         }
+        vms = vms.map((vm) => {
+            if (!vm.vmPorts) {
+                vm.vmPorts = []
+            }
+            if (!vm.trueAnswers) {
+                vm.trueAnswers = []
+            }
+            return vm
+        })
         res.json(vms)
     })
 }
@@ -25,7 +34,8 @@ module.exports.updateVm = () => (req, res) => {
                 vmDescription: fields.vmDescription,
                 vmShortDescription: fields.vmShortDescription,
                 vmIpHost: fields.vmIpHost,
-                vmPorts: fields.vmPorts
+                vmPorts: fields.vmPorts ? fields.vmPorts.split(',') : null,
+                trueAnswers: fields.trueAnswers ? fields.trueAnswers.split(',') : null
             },
             (error, writeOpResult) => {
                 if (error) {

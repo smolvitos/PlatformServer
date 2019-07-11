@@ -231,7 +231,7 @@ module.exports.deleteService = () => (req, res) => { //input JSON {state, baseIm
         .then((info) => {
             res.json({
                 status: 'success',
-				message: `${req.body.baseImage} has been deleted. ${info}`
+				message: `${req.body.baseImage} has been deleted.`
 			})
         })
 		.catch((error) => {
