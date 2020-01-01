@@ -8,7 +8,7 @@ let dockerServicesGlobal = []
 
 function listServices() {
     return (req, res) => {
-        docker.image.list()
+        docker.image.list() //список образов
         .then((images) => {
             //console.log(images)
             Promise.all(images.map((image) => {
@@ -26,14 +26,14 @@ function listServices() {
                         serviceShortDescription: null
                     }
                 })
-            }))
+            })) //в конце концов вернули типизированный объект сервиса как элемент массива (все через параллельную обработку)
             .then((dockerServices) => {
-                dockerServicesGlobal = dockerServices
+                dockerServicesGlobal = dockerServices //резервирование
             })
         })
         .then(() => {
             docker.container.list({all: true})
-            .then((containers) => {
+            .then((containers) => { //теперь учитываем, что могут уже быть контейнеры
                 Promise.all(dockerServicesGlobal.map((dockerService) => {
                     //console.log(dockerService.baseImage)
                     return DockerModel.findOne({ baseImage: new RegExp(dockerService.baseImage, 'i') }).exec()
@@ -58,6 +58,7 @@ function listServices() {
                                 }
                             }
                         }
+                        dockerService._id = info._id
                         dockerService.serviceName = info.serviceName
                         dockerService.serviceDescription = info.serviceDescription
                         dockerService.serviceShortDescription = info.serviceShortDescription

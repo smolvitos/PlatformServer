@@ -2,6 +2,7 @@ const express =require('express')
 const router = express.Router()
 const dockerAPI = require('../middleware/docker/')
 const vmAPI = require('../middleware/vm/')
+const usersAPI = require('../middleware/users/')
 const initPassport = require('../configs/passport').init
 const passport = initPassport(require('passport'))
 const jwtOptions = require('../configs/passport').jwtOptions
@@ -16,6 +17,11 @@ router.post('/api/v1/services/update', passport.authenticate('jwt', {session: fa
 router.get('/api/v1/vms/list', passport.authenticate('jwt', {session: false}), vmAPI.listVms()) //
 router.post('/api/v1/vms/update', passport.authenticate('jwt', {session: false}), checkPrivileges, vmAPI.updateVm()) //
 router.post('/api/v1/vms/delete', passport.authenticate('jwt', {session: false}), checkPrivileges, vmAPI.deleteVm()) //
+router.get('/api/v1/users/list', passport.authenticate('jwt', {session: false}), checkPrivileges, usersAPI.listUsers()) //
+router.post('/api/v1/users/delete', passport.authenticate('jwt', {session: false}), checkPrivileges, usersAPI.deleteUser()) //
+router.post('/api/v1/users/edit', passport.authenticate('jwt', {session: false}), checkPrivileges, usersAPI.editUser()) //
+router.post('/api/v1/users/checkflag', passport.authenticate('jwt', {session: false}), usersAPI.checkFlag()) //
+router.get('/api/v1/users/getuserinfo', passport.authenticate('jwt', {session: false}), usersAPI.getUserInfo()) //
 
 
 module.exports = router

@@ -19,7 +19,8 @@ const UserSchema = mongoose.Schema({
 		max: 100
 	},
 	gender: String,
-    isAdmin: Boolean
+    isAdmin: Boolean,
+    passedFlags: Array
 })
 
 UserSchema.methods.comparePassword = function(password, callback) {
@@ -35,6 +36,22 @@ UserSchema.methods.comparePassword = function(password, callback) {
 UserSchema.pre('save', function(next) {
 	const user = this
 	if (this.isModified('password') || this.isNew) {
+		bcrypt.genSalt(10, (error, salt) => {
+			if (error) return next(error)
+			bcrypt.hash(user.password, salt, (error, hash) => {
+				if (error) return next(error)
+				user.password = hash
+				next()
+			})
+		})
+	} else {
+		next()
+	}
+})
+
+UserSchema.pre('updateOne', function(next) {
+	const user = this
+	if (this.password) {
 		bcrypt.genSalt(10, (error, salt) => {
 			if (error) return next(error)
 			bcrypt.hash(user.password, salt, (error, hash) => {
